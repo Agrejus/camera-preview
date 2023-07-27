@@ -420,6 +420,22 @@ extension CameraController {
         }
         // self.videoOutput?.stopRecording()
     }
+
+    func focusPoint(x: Int, y: Int) throws{
+        guard let device = self.currentCameraPosition == .rear ? rearCamera : frontCamera else { return }
+        do {
+            try device.lockForConfiguration()
+            let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
+            if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode) {
+                device.focusMode = AVCaptureDevice.FocusMode.locked;
+                device.focusPointOfInterest = CGPoint(x: CGFloat(x), y: CGFloat(y))
+                device.focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus;
+            }
+            device.unlockForConfiguration()
+        } catch {
+            debugPrint(error)
+        }
+    }
 }
 
 extension CameraController: UIGestureRecognizerDelegate {
