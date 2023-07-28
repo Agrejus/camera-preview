@@ -118,7 +118,7 @@ public class CameraPreview extends Plugin implements CameraActivity.CameraPrevie
     }
 
     @PluginMethod
-    public void focusPoint(PluginCall call){
+    public void focus(PluginCall call){
         if (this.hasCamera(call) == false) {
             call.reject("Camera is not running");
             return;

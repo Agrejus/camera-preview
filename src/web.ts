@@ -5,8 +5,7 @@ import {
   CameraPreviewPlugin,
   CameraPreviewFlashMode,
   CameraSampleOptions,
-  CameraOpacityOptions,
-  CameraPreviewXY,
+  CameraOpacityOptions
 } from './definitions';
 
 export class CameraPreviewWeb extends WebPlugin implements CameraPreviewPlugin {
@@ -23,8 +22,7 @@ export class CameraPreviewWeb extends WebPlugin implements CameraPreviewPlugin {
     });
   }
 
-  focusPoint(_: CameraPreviewXY) {
-    console.log('NOT IMPLEMENTED')
+  async focus() {
     throw new Error('Method not implemented.');
   }
 

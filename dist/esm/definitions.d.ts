@@ -71,9 +71,5 @@ export interface CameraPreviewPlugin {
     }): Promise<void>;
     flip(): Promise<void>;
     setOpacity(options: CameraOpacityOptions): Promise<{}>;
-    focusPoint(options: CameraPreviewXY): void;
-}
-export interface CameraPreviewXY {
-    x?: number;
-    y?: number;
+    focus(): Promise<void>;
 }

@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import { CameraPreviewOptions, CameraPreviewPictureOptions, CameraPreviewPlugin, CameraPreviewFlashMode, CameraSampleOptions, CameraOpacityOptions, CameraPreviewXY } from './definitions';
+import { CameraPreviewOptions, CameraPreviewPictureOptions, CameraPreviewPlugin, CameraPreviewFlashMode, CameraSampleOptions, CameraOpacityOptions } from './definitions';
 export declare class CameraPreviewWeb extends WebPlugin implements CameraPreviewPlugin {
     /**
      *  track which camera is used based on start options
@@ -7,7 +7,7 @@ export declare class CameraPreviewWeb extends WebPlugin implements CameraPreview
      */
     private isBackCamera;
     constructor();
-    focusPoint(_: CameraPreviewXY): void;
+    focus(): Promise<void>;
     start(options: CameraPreviewOptions): Promise<{}>;
     stop(): Promise<any>;
     capture(options: CameraPreviewPictureOptions): Promise<any>;

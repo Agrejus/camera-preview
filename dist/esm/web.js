@@ -6,8 +6,7 @@ export class CameraPreviewWeb extends WebPlugin {
             platforms: ['web'],
         });
     }
-    focusPoint(_) {
-        console.log('NOT IMPLEMENTED');
+    async focus() {
         throw new Error('Method not implemented.');
     }
     async start(options) {
