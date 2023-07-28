@@ -421,10 +421,9 @@ extension CameraController {
         // self.videoOutput?.stopRecording()
     }
 
-    func focusPoint(x: Int, y: Int) throws{
+    func focusPoint(x: Int, y: Int) throws {
         guard let device = self.currentCameraPosition == .rear ? rearCamera : frontCamera else { return }
         do {
-            debugPrint("FOCUS")
             try device.lockForConfiguration()
             let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
             if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode) {
