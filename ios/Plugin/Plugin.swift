@@ -288,18 +288,9 @@ public class CameraPreview: CAPPlugin {
         }
     }
 
-    @objc func focusPoint(_ call: CAPPluginCall) {
-        // guard let x = call.getInt("x") else{
-        //     call.reject("failed to set focuspoint, x is missing")
-        //     return
-        // }
-
-        // guard let y = call.getInt("y") else{
-        //     call.reject("failed to set focuspoint, y is missing")
-        //     return
-        // }
+    @objc func focus(_ call: CAPPluginCall) {
         do {
-            try self.cameraController.focusPoint(x: 214, y: 345)
+            try self.cameraController.focus()
             call.resolve()
         } catch {
             call.reject("failed to set focus")

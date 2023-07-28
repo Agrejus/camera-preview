@@ -60,7 +60,7 @@ extension CameraController {
                     self.rearCamera = camera
 
                     try camera.lockForConfiguration()
-                    camera.focusMode = .continuousAutoFocus
+                    camera.focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
                     camera.unlockForConfiguration()
                 }
             }
@@ -421,15 +421,18 @@ extension CameraController {
         // self.videoOutput?.stopRecording()
     }
 
-    func focusPoint(x: Int, y: Int) throws {
+    func focus() throws {
         guard let device = self.currentCameraPosition == .rear ? rearCamera : frontCamera else { return }
         do {
             try device.lockForConfiguration()
             let focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus
-            if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode) {
-                device.focusMode = AVCaptureDevice.FocusMode.locked;
-                device.focusPointOfInterest = CGPoint(x: CGFloat(x), y: CGFloat(y))
-                device.focusMode = AVCaptureDevice.FocusMode.continuousAutoFocus;
+            let exposureMode = AVCaptureDevice.ExposureMode.autoExpose
+            if device.isFocusPointOfInterestSupported  && device.isFocusModeSupported(focusMode) && device.isExposureModeSupported(exposureMode) {
+
+                device.exposureMode = exposureMode;
+                device.focusPointOfInterest = CGPoint(x: 0.5, y: 0.5)
+                device.focusMode = AVCaptureDevice.FocusMode.autoFocus;
+
             }
             device.unlockForConfiguration()
         } catch {
