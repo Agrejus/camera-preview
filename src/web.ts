@@ -22,8 +22,9 @@ export class CameraPreviewWeb extends WebPlugin implements CameraPreviewPlugin {
       platforms: ['web'],
     });
   }
-  
+
   focusPoint(_: CameraPreviewXY) {
+    console.log('NOT IMPLEMENTED')
     throw new Error('Method not implemented.');
   }
 
