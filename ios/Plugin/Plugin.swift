@@ -22,6 +22,7 @@ public class CameraPreview: CAPPlugin {
     var enableZoom: Bool?
     var highResolutionOutput: Bool = false
     var disableAudio: Bool = false
+    var onTap = "onTap"
 
     @objc func rotated() {
         let height = self.paddingBottom != nil ? self.height! - self.paddingBottom!: self.height!;
@@ -39,6 +40,10 @@ public class CameraPreview: CAPPlugin {
         }
 
         cameraController.updateVideoOrientation()
+    }
+
+    @objc func notifyOnTapListener(_ point: CGPoint) {
+        notifyListeners(onTap, data: ["count": count])
     }
 
     @objc func start(_ call: CAPPluginCall) {
