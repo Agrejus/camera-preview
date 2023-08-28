@@ -43,7 +43,7 @@ public class CameraPreview: CAPPlugin {
     }
 
     @objc func notifyOnTapListener(_ point: CGPoint) {
-        notifyListeners(onTap, data: ["count": count])
+        notifyListeners(onTap, data: ["x": point.x, "y": point.y])
     }
 
     @objc func start(_ call: CAPPluginCall) {
