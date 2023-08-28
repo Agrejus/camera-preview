@@ -10,6 +10,7 @@ import AVFoundation
 import UIKit
 
 class CameraController: NSObject {
+    
     var captureSession: AVCaptureSession?
 
     var currentCameraPosition: CameraPosition?
@@ -36,6 +37,13 @@ class CameraController: NSObject {
     var audioInput: AVCaptureDeviceInput?
 
     var zoomFactor: CGFloat = 1.0
+    private var plugin: CameraPreview?
+
+    init(_ plugin: CameraPreview?) {
+        super.init()
+        self.plugin = plugin
+    }
+
 }
 
 extension CameraController {
@@ -462,6 +470,8 @@ extension CameraController: UIGestureRecognizerDelegate {
         do {
             try device.lockForConfiguration()
             defer { device.unlockForConfiguration() }
+
+            plugin?.notifyOnTapListener(point)
 
             let focusMode = AVCaptureDevice.FocusMode.autoFocus
             if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(focusMode) {

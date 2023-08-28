@@ -1,3 +1,4 @@
+import { PluginListenerHandle } from "@capacitor/core";
 export declare type CameraPosition = 'rear' | 'front';
 export interface CameraPreviewOptions {
     /** Parent element to attach the video preview element to (applicable to the web platform only) */
@@ -72,4 +73,9 @@ export interface CameraPreviewPlugin {
     flip(): Promise<void>;
     setOpacity(options: CameraOpacityOptions): Promise<{}>;
     focus(): Promise<void>;
+    addListener(eventName: 'onTap', listenerFunc: (data: {
+        x: number;
+        y: number;
+    }) => void): Promise<PluginListenerHandle> & PluginListenerHandle;
+    removeAllListeners(): Promise<void>;
 }

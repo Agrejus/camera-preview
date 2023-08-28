@@ -10,7 +10,7 @@ public class CameraPreview: CAPPlugin {
 
     var previewView: UIView!
     var cameraPosition = String()
-    let cameraController = CameraController()
+    private var cameraController: CameraController?
     var x: CGFloat?
     var y: CGFloat?
     var width: CGFloat?
@@ -24,22 +24,26 @@ public class CameraPreview: CAPPlugin {
     var disableAudio: Bool = false
     var onTap = "onTap"
 
+    override public func load() {
+        self.cameraController = CameraController(self)
+    }
+
     @objc func rotated() {
         let height = self.paddingBottom != nil ? self.height! - self.paddingBottom!: self.height!;
 
         if UIApplication.shared.statusBarOrientation.isLandscape {
             self.previewView.frame = CGRect(x: self.y!, y: self.x!, width: max(height, self.width!), height: min(height, self.width!))
-            self.cameraController.previewLayer?.frame = self.previewView.frame
+            self.cameraController?.previewLayer?.frame = self.previewView.frame
         }
 
         if UIApplication.shared.statusBarOrientation.isPortrait {
             if (self.previewView != nil && self.x != nil && self.y != nil && self.width != nil && self.height != nil) {
                 self.previewView.frame = CGRect(x: self.x!, y: self.y!, width: min(height, self.width!), height: max(height, self.width!))
             }
-            self.cameraController.previewLayer?.frame = self.previewView.frame
+            self.cameraController?.previewLayer?.frame = self.previewView.frame
         }
 
-        cameraController.updateVideoOrientation()
+        cameraController?.updateVideoOrientation()
     }
 
     @objc func notifyOnTapListener(_ point: CGPoint) {
@@ -49,7 +53,7 @@ public class CameraPreview: CAPPlugin {
     @objc func start(_ call: CAPPluginCall) {
         self.cameraPosition = call.getString("position") ?? "rear"
         self.highResolutionOutput = call.getBool("enableHighResolution") ?? false
-        self.cameraController.highResolutionOutput = self.highResolutionOutput
+        self.cameraController?.highResolutionOutput = self.highResolutionOutput
 
         if call.getInt("width") != nil {
             self.width = CGFloat(call.getInt("width")!)
@@ -80,10 +84,10 @@ public class CameraPreview: CAPPlugin {
             }
 
             DispatchQueue.main.async {
-                if self.cameraController.captureSession?.isRunning ?? false {
+                if self.cameraController?.captureSession?.isRunning ?? false {
                     call.reject("camera already started")
                 } else {
-                    self.cameraController.prepare(cameraPosition: self.cameraPosition, disableAudio: self.disableAudio){error in
+                    self.cameraController?.prepare(cameraPosition: self.cameraPosition, disableAudio: self.disableAudio){error in
                         if let error = error {
                             print(error)
                             call.reject(error.localizedDescription)
@@ -98,10 +102,10 @@ public class CameraPreview: CAPPlugin {
                         if self.toBack! {
                             self.webView?.superview?.bringSubviewToFront(self.webView!)
                         }
-                        try? self.cameraController.displayPreview(on: self.previewView)
+                        try? self.cameraController?.displayPreview(on: self.previewView)
 
                         let frontView = self.toBack! ? self.webView : self.previewView
-                        self.cameraController.setupGestures(target: frontView ?? self.previewView, enableZoom: self.enableZoom!)
+                        self.cameraController?.setupGestures(target: frontView ?? self.previewView, enableZoom: self.enableZoom!)
 
                         if self.rotateWhenOrientationChanged == true {
                             NotificationCenter.default.addObserver(self, selector: #selector(CameraPreview.rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
@@ -118,7 +122,7 @@ public class CameraPreview: CAPPlugin {
 
     @objc func flip(_ call: CAPPluginCall) {
         do {
-            try self.cameraController.switchCameras()
+            try self.cameraController?.switchCameras()
             call.resolve()
         } catch {
             call.reject("failed to flip camera")
@@ -127,8 +131,8 @@ public class CameraPreview: CAPPlugin {
 
     @objc func stop(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            if self.cameraController.captureSession?.isRunning ?? false {
-                self.cameraController.captureSession?.stopRunning()
+            if self.cameraController?.captureSession?.isRunning ?? false {
+                self.cameraController?.captureSession?.stopRunning()
                 self.previewView.removeFromSuperview()
                 self.webView?.isOpaque = true
                 call.resolve()
@@ -153,7 +157,7 @@ public class CameraPreview: CAPPlugin {
 
             let quality: Int? = call.getInt("quality", 85)
 
-            self.cameraController.captureImage { (image, error) in
+            self.cameraController?.captureImage { (image, error) in
 
                 guard let image = image else {
                     print(error ?? "Image capture error")
@@ -165,7 +169,7 @@ public class CameraPreview: CAPPlugin {
                     return
                 }
                 let imageData: Data?
-                if self.cameraController.currentCameraPosition == .front {
+                if self.cameraController?.currentCameraPosition == .front {
                     let flippedImage = image.withHorizontallyFlippedOrientation()
                     imageData = flippedImage.jpegData(compressionQuality: CGFloat(quality!/100))
                 } else {
@@ -192,7 +196,7 @@ public class CameraPreview: CAPPlugin {
         DispatchQueue.main.async {
             let quality: Int? = call.getInt("quality", 85)
 
-            self.cameraController.captureSample { image, error in
+            self.cameraController?.captureSample { image, error in
                 guard let image = image else {
                     print("Image capture error: \(String(describing: error))")
                     call.reject("Image capture error: \(String(describing: error))")
@@ -225,7 +229,7 @@ public class CameraPreview: CAPPlugin {
 
     @objc func getSupportedFlashModes(_ call: CAPPluginCall) {
         do {
-            let supportedFlashModes = try self.cameraController.getSupportedFlashModes()
+            let supportedFlashModes = try self.cameraController?.getSupportedFlashModes()
             call.resolve(["result": supportedFlashModes])
         } catch {
             call.reject("failed to get supported flash modes")
@@ -249,9 +253,9 @@ public class CameraPreview: CAPPlugin {
             default: break
             }
             if flashModeAsEnum != nil {
-                try self.cameraController.setFlashMode(flashMode: flashModeAsEnum!)
+                try self.cameraController?.setFlashMode(flashMode: flashModeAsEnum!)
             } else if flashMode == "torch" {
-                try self.cameraController.setTorchMode()
+                try self.cameraController?.setTorchMode()
             } else {
                 call.reject("Flash Mode not supported")
                 return
@@ -267,7 +271,7 @@ public class CameraPreview: CAPPlugin {
 
             let quality: Int? = call.getInt("quality", 85)
 
-            self.cameraController.captureVideo { (image, error) in
+            self.cameraController?.captureVideo { (image, error) in
 
                 guard let image = image else {
                     print(error ?? "Image capture error")
@@ -288,14 +292,14 @@ public class CameraPreview: CAPPlugin {
 
     @objc func stopRecordVideo(_ call: CAPPluginCall) {
 
-        self.cameraController.stopRecording { (_) in
+        self.cameraController?.stopRecording { (_) in
 
         }
     }
 
     @objc func focus(_ call: CAPPluginCall) {
         do {
-            try self.cameraController.focus()
+            try self.cameraController?.focus()
             call.resolve()
         } catch {
             call.reject("failed to set focus")

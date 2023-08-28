@@ -32,6 +32,7 @@ import org.json.JSONArray;
 public class CameraPreview extends Plugin implements CameraActivity.CameraPreviewListener {
 
     static final String CAMERA_PERMISSION_ALIAS = "camera";
+    public static final String ON_TAP_EVENT = "onTap";
 
     private static String VIDEO_FILE_PATH = "";
     private static String VIDEO_FILE_EXTENSION = ".mp4";
@@ -46,6 +47,13 @@ public class CameraPreview extends Plugin implements CameraActivity.CameraPrevie
 
     private CameraActivity fragment;
     private int containerViewId = 20;
+
+    public void notifyTapListeners(Integer x, Integer y) {
+        JSObject listenerResult = new JSObject();
+        listenerResult.put("x", x);
+        listenerResult.put("y", y);
+        notifyListeners(ON_TAP_EVENT, listenerResult);
+    }
 
     @PluginMethod
     public void echo(PluginCall call) {

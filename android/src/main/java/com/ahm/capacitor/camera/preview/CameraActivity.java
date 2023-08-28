@@ -50,6 +50,8 @@ import com.ahm.capacitor.camera.preview.utils.fixSamsungImages.src.ImageProcesso
 
 public class CameraActivity extends Fragment {
 
+    private CameraPreview cameraPreview;
+
     public interface CameraPreviewListener {
         void onPictureTaken(String originalPicture);
         void onPictureTakenError(String message);
@@ -108,6 +110,10 @@ public class CameraActivity extends Fragment {
     public int x;
     public int y;
 
+
+    public void setCameraPreview(CameraPreview preview) {
+        this.cameraPreview = preview;
+    }
     public void setEventListener(CameraPreviewListener listener) {
         eventListener = listener;
     }
@@ -181,6 +187,7 @@ public class CameraActivity extends Fragment {
                                     int action = event.getAction();
                                     int eventCount = event.getPointerCount();
                                     Log.d(TAG, "onTouch event, action, count: " + event + ", " + action + ", " + eventCount);
+                                    cameraPreview.notifyTapListeners(-1, -1);
                                     if (eventCount > 1) {
                                         // handle multi-touch events
                                         Camera.Parameters params = mCamera.getParameters();
@@ -208,9 +215,14 @@ public class CameraActivity extends Fragment {
                                             } else if (tapToTakePicture) {
                                                 takePicture(0, 0, 85);
                                             } else if (tapToFocus) {
+
+                                                int x = (int) event.getX(0);
+                                                int y = (int) event.getY(0);
+                                                cameraPreview.notifyTapListeners(x, y);
+
                                                 setFocusArea(
-                                                    (int) event.getX(0),
-                                                    (int) event.getY(0),
+                                                    x,
+                                                    y,
                                                     new Camera.AutoFocusCallback() {
                                                         public void onAutoFocus(boolean success, Camera camera) {
                                                             if (success) {
