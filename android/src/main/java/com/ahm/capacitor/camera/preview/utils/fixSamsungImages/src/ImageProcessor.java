@@ -11,17 +11,17 @@ import com.ahm.capacitor.camera.preview.utils.fixSamsungImages.src.utils.JpegUti
 
 public class ImageProcessor {
 
-    public static byte[] processImage(byte[] data) {
+    public static byte[] processImage(byte[] data) throws Exception {
         if (!JpegUtils.isJpeg(data)) {
-            throw new Error("The file provided is not a jpeg");
+            throw new Exception("The file provided is not a jpeg");
         }
 
         if (!JpegUtils.hasExif(data)) {
-            throw new Error("The file provided does not have exif data");
+            throw new Exception("The file provided does not have exif data");
         }
 
         if (JpegUtils.getByteAlignment(data) != ByteAlignment.MOTOROLA) {
-            throw new Error(
+            throw new Exception(
                     "Your file uses non-motorola byte alignment. I'm not writing code to handle that, sorry");
         }
 
@@ -36,19 +36,25 @@ public class ImageProcessor {
             int trueOffset = 0xFFFF + 1 + brokenOffset + 2;
 
             if (data[trueOffset] != (byte) 0xFF || data[trueOffset + 1] != (byte) 0xD9) {
-                throw new Error(
+                throw new Exception(
                         "Couldn't find end of APP0 with offset: " + ByteUtils.toHexString(trueOffset));
             }
 
             int thumbnailStartOfImage = appMarkers.get(1).startAddress - 2;
 
             if (data[thumbnailStartOfImage] != (byte) 0xFF || data[thumbnailStartOfImage + 1] != (byte) 0xD8) {
-                throw new Error(
+                throw new Exception(
                         "Couldn't find SOI for APP0: " + ByteUtils.toHexString(trueOffset));
             }
             byte[] dataWithoutApp0 = ByteUtils.deleteSection(data, thumbnailStartOfImage, trueOffset);
 
-            IfdSegment ifd0 = JpegUtils.getIfdDetails(dataWithoutApp0, JpegUtils.getFirstIfdOffeset(dataWithoutApp0));
+            int firstIfdOffset = JpegUtils.getFirstIfdOffeset(dataWithoutApp0);
+
+            if (firstIfdOffset == -1) {
+                throw new Exception("Can't find TAG marker after byte alignment.");
+            }
+            
+            IfdSegment ifd0 = JpegUtils.getIfdDetails(dataWithoutApp0, firstIfdOffset);
 
             int nextIfdOffset = ByteUtils
                     .sumByteSegment(Arrays.copyOfRange(dataWithoutApp0, ifd0.endOfEntries,

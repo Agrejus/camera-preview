@@ -86,7 +86,7 @@ public class JpegUtils {
 
     public static int getFirstIfdOffeset(byte[] data) {
         if (data[14] != (byte) 0x00 || data[15] != (byte) 0x2A) {
-            throw new Error("Can't find TAG marker after byte alignment.");
+            return -1;
         }
 
         int firstByte = (0xFF & data[16]) * 0x1000000;
